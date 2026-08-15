@@ -99,6 +99,55 @@ class PairedRestorationDataset(Dataset):
         return nlr_t, gt_t
 
 
+class SyntheticDegradationDataset(Dataset):
+    """Generates synthetic (NoisyLR, GT) pairs on the fly: random-crops a GT
+    patch and degrades it with `RandomDegradationPipeline`. Used to mix
+    synthetic augmentation into training alongside real provided pairs.
+    """
+
+    def __init__(self, gt_dir, ids, pipeline, scale_factor=2, patch_size=128, augment=True):
+        assert patch_size % scale_factor == 0, "patch_size must be a multiple of scale_factor"
+        self.gt_dir = gt_dir
+        self.ids = ids
+        self.pipeline = pipeline
+        self.scale_factor = scale_factor
+        self.patch_size = patch_size
+        self.augment = augment
+
+    def __len__(self):
+        return len(self.ids)
+
+    def _random_crop(self, gt):
+        ps = self.patch_size
+        h, w = gt.shape
+        top = random.randint(0, h - ps)
+        left = random.randint(0, w - ps)
+        return gt[top:top + ps, left:left + ps]
+
+    def _augment(self, gt):
+        if random.random() < 0.5:
+            gt = np.fliplr(gt)
+        if random.random() < 0.5:
+            gt = np.flipud(gt)
+        k = random.randint(0, 3)
+        if k:
+            gt = np.rot90(gt, k)
+        return gt
+
+    def __getitem__(self, idx):
+        img_id = self.ids[idx]
+        gt = np.load(os.path.join(self.gt_dir, f"{img_id}.npy")).astype(np.float32)
+        gt = self._random_crop(gt)
+        if self.augment:
+            gt = self._augment(gt)
+        gt = np.ascontiguousarray(gt)
+        nlr = self.pipeline(gt)
+
+        gt_t = torch.from_numpy(gt).unsqueeze(0)
+        nlr_t = torch.from_numpy(np.ascontiguousarray(nlr)).unsqueeze(0)
+        return nlr_t, gt_t
+
+
 class UnpairedNoisyLRDataset(Dataset):
     """Loads NoisyLR-only .npy files (the hidden test set, no GT available)."""
 
