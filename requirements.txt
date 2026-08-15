@@ -12,3 +12,4 @@ matplotlib
 pytorch-msssim
 onnx
 onnxruntime
+onnxscript
