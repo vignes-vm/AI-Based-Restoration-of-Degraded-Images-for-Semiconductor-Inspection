@@ -1,0 +1,55 @@
+seed: 42
+
+data:
+  gt_dir: "train/GT"                # paired ground-truth .npy files, float32 [0,1], 256x256
+  noisy_lr_dir: "train/NoisyLR"     # paired degraded/LR .npy files, float32, NOT clipped, 128x128
+  test_noisy_lr_dir: "NoisyLR"      # unpaired hidden-test NoisyLR .npy files (no GT provided)
+  in_channels: 1                    # grayscale semiconductor imagery
+  gt_size: 256                      # ground-truth crop size (px)
+  scale_factor: 2                   # NoisyLR is 2x downsampled relative to GT (128 -> 256)
+  val_split: 0.1                    # fraction of image IDs held out for validation
+  val_split_seed: 42
+  patch_size: 128                   # random-crop GT patch size used during training (must be multiple of scale_factor)
+  synthetic_ratio: 0.3              # fraction of each training batch built from RandomDegradationPipeline instead of real pairs
+  num_workers: 4
+
+degradation:
+  speckle_variance_range: [0.01, 0.08]
+  gaussian_sigma_range: [0.005, 0.03]     # sigma in normalized [0,1] pixel units
+  downscale_kernels: ["bicubic", "bilinear", "nearest"]
+
+train:
+  batch_size: 16
+  epochs: 200
+  lr: 2.0e-4
+  min_lr: 1.0e-6
+  warmup_epochs: 5
+  weight_decay: 0.01
+  amp: true
+  checkpoint_every: 10
+  log_every_steps: 50
+  device: "cuda"                    # falls back to mps -> cpu automatically if unavailable
+
+model:
+  name: "nafnet_sr"
+  width: 32
+  enc_blocks: [2, 2, 4, 8]
+  middle_blocks: 12
+  dec_blocks: [2, 2, 2, 2]
+
+loss:
+  charbonnier_weight: 1.0
+  ms_ssim_weight: 0.2
+  lpips_weight: 0.05
+  charbonnier_eps: 1.0e-3
+
+baseline:
+  base_channels: 32
+  epochs: 60
+  lr: 1.0e-3
+  batch_size: 16
+
+paths:
+  weights_dir: "weights"
+  results_dir: "results"
+  log_dir: "runs"

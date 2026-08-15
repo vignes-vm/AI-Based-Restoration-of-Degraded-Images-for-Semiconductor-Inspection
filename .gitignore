@@ -216,3 +216,29 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Project-specific ---
+# Trained weights (large binaries) - keep dir via .gitkeep
+weights/*.pth
+weights/*.pt
+weights/*.onnx
+
+# Generated sample/result images - keep dir via .gitkeep
+results/samples/*
+!results/samples/.gitkeep
+
+# Raw dataset (provided locally, not committed)
+train/
+NoisyLR/
+data/raw/
+
+# TensorBoard run logs
+runs/
+tb_logs/
+
+# Local run config snapshots (regenerated per run)
+configs/run_*.yaml
+
+# macOS
+.DS_Store
+
