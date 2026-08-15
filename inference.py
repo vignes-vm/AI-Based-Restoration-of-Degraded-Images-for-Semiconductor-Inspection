@@ -22,6 +22,7 @@ import numpy as np
 import torch
 import yaml
 from PIL import Image
+from tqdm import tqdm
 
 from src.device import resolve_device
 from src.models.nafnet_sr import NAFNetSR
@@ -107,7 +108,7 @@ def main():
     n_processed = 0
 
     batch_size = args.batch_size
-    for batch_start in range(0, len(filenames), batch_size):
+    for batch_start in tqdm(range(0, len(filenames), batch_size), desc="inference batches"):
         t_batch0 = time.time()
         batch_files = filenames[batch_start:batch_start + batch_size]
 
