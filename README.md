@@ -103,4 +103,5 @@ python inference.py --input_dir NoisyLR --output_dir results/restored \
 
 ## Sample Results
 ![App Diagram](results/samples/sample_results.jpeg)
-comparison, throughput benchmarks, and qualitative/failure-case analysis.
+Navigate to [RESULTS.md](results/RESULTS.md) to get insights into comparison, throughput benchmarks, and qualitative/failure-case analysis.
+
