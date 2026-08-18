@@ -25,7 +25,7 @@ generic way, while NAFNet-SR reconstructs finer inspection-relevant detail.
 
 Given the target use case (visual inspection of semiconductor imagery, where
 perceptual detail matters more than raw dB), NAFNet-SR is the recommended
-model and the one packaged in `submission/team_name/`.
+model and the one packaged in `submission/ViyonTech/`.
 
 ## Throughput (NAFNet-SR, `weights/nafnet_sr_best.pth`)
 

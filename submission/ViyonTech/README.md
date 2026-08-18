@@ -36,21 +36,13 @@ python run.py <input-dir> <output-dir>
 ## Contents
 
 ```
-team_name/
+ViyonTech/
 ├── run.py              # entry point: python run.py <input-dir> <output-dir>
 ├── requirements.txt
 ├── README.md
-├── models/
-│   └── nafnet_sr_best.pth  # trained model checkpoint (place here after training)
-└── src/
-    ├── device.py            # GPU/CPU device resolution
-    └── models/
-        ├── nafnet_sr.py     # NAFNet-SR architecture
-        └── nafnet_blocks.py # NAFBlock building blocks
+└── models/
+    └── nafnet_sr_best.pth  # trained model checkpoint (bundled)
 ```
 
-## Note
-
-`models/nafnet_sr_best.pth` must be produced by running `train.py` from the
-main repository (see top-level README) and copied into this folder before
-final submission.
+(`src/` contains supporting model-definition and device-resolution code
+imported by `run.py`; it ships alongside the four items above.)
