@@ -31,10 +31,14 @@ class MSSSIMLoss(nn.Module):
         self.win_size = win_size
 
     def forward(self, pred, target):
-        pred = pred.clamp(0, 1)
-        target = target.clamp(0, 1)
-        return 1.0 - ms_ssim(pred, target, data_range=self.data_range,
-                              size_average=True, win_size=self.win_size)
+        # ms_ssim divides by local variance internally; under fp16 autocast
+        # on near-flat semiconductor background patches this can overflow to
+        # NaN/Inf. Force fp32 here too, same rationale as PerceptualLoss.
+        with torch.autocast(device_type=pred.device.type, enabled=False):
+            pred = pred.float().clamp(0, 1)
+            target = target.float().clamp(0, 1)
+            return 1.0 - ms_ssim(pred, target, data_range=self.data_range,
+                                  size_average=True, win_size=self.win_size)
 
 
 class PerceptualLoss(nn.Module):
@@ -50,9 +54,14 @@ class PerceptualLoss(nn.Module):
             p.requires_grad_(False)
 
     def forward(self, pred, target):
-        pred = pred.clamp(0, 1).repeat(1, 3, 1, 1) * 2 - 1
-        target = target.clamp(0, 1).repeat(1, 3, 1, 1) * 2 - 1
-        return self.model(pred, target).mean()
+        # LPIPS's VGG/AlexNet backbone is prone to NaN/Inf under fp16/bf16
+        # autocast (squared-difference + normalization ops overflow in low
+        # precision). Force this submodule to run in fp32 regardless of the
+        # surrounding autocast context.
+        with torch.autocast(device_type=pred.device.type, enabled=False):
+            pred = pred.float().clamp(0, 1).repeat(1, 3, 1, 1) * 2 - 1
+            target = target.float().clamp(0, 1).repeat(1, 3, 1, 1) * 2 - 1
+            return self.model(pred, target).mean()
 
 
 class CombinedRestorationLoss(nn.Module):

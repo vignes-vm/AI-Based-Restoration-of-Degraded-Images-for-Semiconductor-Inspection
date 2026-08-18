@@ -155,6 +155,15 @@ def main():
                 pred = model(nlr)
                 loss, components = criterion(pred, gt)
 
+            if not torch.isfinite(loss):
+                # A single NaN/Inf loss (e.g. from an unstable LPIPS/MS-SSIM
+                # step) would otherwise poison every weight via backward().
+                # Skip this step entirely instead of corrupting the model.
+                print(f"[warn] non-finite loss at step {global_step} "
+                      f"(components={components}) — skipping optimizer step")
+                global_step += 1
+                continue
+
             if scaler.is_enabled():
                 scaler.scale(loss).backward()
                 scaler.step(optimizer)
@@ -194,7 +203,9 @@ def main():
             print(f"[checkpoint] saved -> {ckpt_path}")
 
         score = val_psnr + val_ssim * 10  # combine on comparable scales
-        if score > best_score:
+        if math.isnan(score):
+            print(f"[warn] epoch {epoch}: NaN validation score — not eligible as best checkpoint")
+        elif score > best_score:
             best_score = score
             best_path = os.path.join(cfg["paths"]["weights_dir"], "nafnet_sr_best.pth")
             torch.save({"model": model.state_dict(), "epoch": epoch, "val_psnr": val_psnr,
