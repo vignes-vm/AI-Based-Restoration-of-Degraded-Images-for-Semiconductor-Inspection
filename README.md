@@ -101,7 +101,6 @@ python inference.py --input_dir NoisyLR --output_dir results/restored \
   measured throughput, including the (counterintuitive on this particular
   GPU) FP32-vs-FP16 comparison.
 
-## Results
-
-See [`results/RESULTS.md`](results/RESULTS.md) for the full metrics
+## Sample Results
+![App Diagram](results/samples/sample_results.jpeg)
 comparison, throughput benchmarks, and qualitative/failure-case analysis.
