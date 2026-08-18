@@ -94,13 +94,12 @@ python inference.py --input_dir NoisyLR --output_dir results/restored \
   represent the hidden test distribution (same `.npy`, 128×128, unclipped
   float32 format as the paired training NoisyLR). `inference.py` is built to
   run against exactly that directory structure with no code changes.
-- **This development environment has no CUDA GPU** (Apple Silicon /
-  MPS-only). All scripts default to `cuda` per the spec but fall back
-  automatically to `mps` then `cpu` (`src/device.py`). Training wall-clock
-  numbers in `results/RESULTS.md` were measured on MPS, not the CUDA
-  hardware the pipeline is designed for; benchmarking and AMP code paths
-  are written to be correct on CUDA even though they weren't exercised there
-  in this environment.
+- **Training and benchmarking were run on an NVIDIA GeForce RTX 3050 Laptop
+  GPU.** All scripts default to `cuda` per the spec but fall back
+  automatically to `mps` then `cpu` (`src/device.py`) for development on
+  Apple Silicon / CPU-only machines. See `results/RESULTS.md` for the
+  measured throughput, including the (counterintuitive on this particular
+  GPU) FP32-vs-FP16 comparison.
 
 ## Results
 

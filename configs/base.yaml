@@ -11,7 +11,7 @@ data:
   val_split_seed: 42
   patch_size: 128                   # random-crop GT patch size used during training (must be multiple of scale_factor)
   synthetic_ratio: 0.3              # fraction of each training batch built from RandomDegradationPipeline instead of real pairs
-  num_workers: 4
+  num_workers: 0                    # Windows + CUDA DLL reload per worker triggers paging-file errors; keep main-process loading
 
 degradation:
   speckle_variance_range: [0.01, 0.08]

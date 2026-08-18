@@ -227,6 +227,13 @@ weights/*.onnx
 results/samples/*
 !results/samples/.gitkeep
 
+# Generated inference outputs on the hidden test set (regenerable from checkpoint)
+results/restored/
+
+# Submission checkpoint (large binary, exceeds GitHub's 100MB push limit;
+# copied from weights/nafnet_sr_best.pth before packaging for submission)
+submission/team_name/models/*.pth
+
 # Raw dataset (provided locally, not committed)
 train/
 NoisyLR/
